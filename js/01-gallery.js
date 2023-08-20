@@ -16,23 +16,31 @@ const createListOfPictures = (arr) =>
     .join("");
 
 const handleList = (event) => {
+  const imageSource = event.target.dataset.source;
+
   event.preventDefault();
 
   if (event.target.nodeName !== "IMG") {
     return;
   }
 
-  const instance = basicLightbox.create(`
-    <img src="${event.target.dataset.source}" width="800" height="600">
-`);
-
-  instance.show();
-
-  ulEl.addEventListener("keydown", (event) => {
+  const closeLightboxOnEscape = (event) => {
     if (event.code === "Escape") {
       instance.close();
     }
-  });
+  };
+
+  const instance = basicLightbox.create(
+    `<img src="${imageSource}" width="800" height="600">`,
+    {
+      onShow: (instance) =>
+        window.addEventListener("keydown", closeLightboxOnEscape),
+      onClose: (instance) =>
+        window.removeEventListener("keydown", closeLightboxOnEscape),
+    }
+  );
+
+  instance.show();
 };
 
 ulEl.insertAdjacentHTML("afterbegin", createListOfPictures(galleryItems));
